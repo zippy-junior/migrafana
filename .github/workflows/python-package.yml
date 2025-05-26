@@ -41,7 +41,7 @@ jobs:
         pytest
     - name: Build
       run: |
-        cd ..
+        ls -la
         pip install --upgrade build
         python -m build
     - name: Archive production artifacts
