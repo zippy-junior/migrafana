@@ -1,6 +1,6 @@
 from copy import deepcopy
 import pytest  # type: ignore
-from src.json_parser.parser import (
+from migrafana.src.json_parser.parser import (
     JSONPathProcessor,
     JSONPathNormalizer,
     JSONPathResolver,
