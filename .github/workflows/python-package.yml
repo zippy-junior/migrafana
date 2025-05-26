@@ -38,5 +38,11 @@ jobs:
     - name: Test with pytest
       run: |
         export PYTHONPATH="/home/runner/work/migrafana/migrafana"
-        echo $PYTHONPATH
         pytest
+    - name: Build
+      run: |
+        python -m build
+    - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        path: |
+          dist
