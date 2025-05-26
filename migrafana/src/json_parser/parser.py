@@ -304,6 +304,8 @@ class JSONPathTraverser:
         current = data
         for comp in components[:-1]:
             if isinstance(current, dict):
+                if not current.get(comp):
+                    raise ValueError
                 current = current[comp]
             elif isinstance(current, list):
                 current = current[int(comp)]
@@ -341,22 +343,6 @@ class JSONPathOperator:
                 raise ValueError(f"Test failed at {path}")
         else:
             raise ValueError(f"Unsupported operation: {op}")
-
-    @staticmethod
-    def _resolve_path(
-        data: Union[Dict, List],
-        components: List[str]
-    ) -> Tuple[Any, str]:
-        """Resolves path components to parent and target"""
-        current = data
-        for comp in components[:-1]:
-            if isinstance(current, dict):
-                current = current[comp]
-            elif isinstance(current, list):
-                current = current[int(comp)]
-            else:
-                raise ValueError(f"Cannot traverse into {type(current)}")
-        return current, components[-1]
 
     @staticmethod
     def _add(
