@@ -3,10 +3,10 @@ import os
 import click
 from dotenv import load_dotenv
 
-from src.api.datasource import GrafanaDataSourceManager
-from src.json_parser.parser import apply_patch
-from src.api.dashboard import GrafanaDashboardManager
-from src.api.models import GrafanaCreds
+from api.datasource import GrafanaDataSourceManager
+from json_parser.parser import apply_patch
+from api.dashboard import GrafanaDashboardManager
+from api.models import GrafanaCreds
 
 load_dotenv()
 
@@ -88,3 +88,11 @@ def get_datasources(src):
     dash_manager = GrafanaDataSourceManager(src, creds)
     datasources = dash_manager.list_datasources()
     print(datasources)
+
+
+def main():
+    cli()
+
+
+if __name__ == "__main__":
+    main()

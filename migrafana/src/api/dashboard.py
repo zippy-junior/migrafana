@@ -1,6 +1,5 @@
-import json
 from typing import Dict, List
-from src.api.base import GrafanaBaseManager
+from api.base import GrafanaBaseManager
 
 
 class GrafanaDashboardManager(GrafanaBaseManager):

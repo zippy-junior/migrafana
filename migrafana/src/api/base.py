@@ -1,6 +1,6 @@
 from grafana_client import GrafanaApi
 
-from src.api.models import GrafanaConnection, GrafanaCreds
+from api.models import GrafanaConnection, GrafanaCreds
 
 
 class GrafanaBaseManager():

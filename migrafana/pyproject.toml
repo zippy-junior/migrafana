@@ -1,0 +1,34 @@
+[project]
+name = "migrafana"
+version = "0.0.1"
+dependencies = [
+    'annotated-types',
+    'certifi',
+    'charset-normalizer',
+    'click',
+    'dotenv',
+    'grafana-client',
+    'h11',
+    'idna',
+    'jh2',
+    'niquests',
+    'pydantic',
+    'pydantic_core',
+    'python-dotenv',
+    'qh3',
+    'requests',
+    'typing-inspection',
+    'typing_extensions',
+    'urllib3',
+    'urllib3-future',
+    'verlib2',
+    'wassima',
+    'importlib-metadata; python_version<"3.10"',
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+migrafana = "cli.main:main"
