@@ -1,6 +1,6 @@
 from copy import deepcopy
 import pytest  # type: ignore
-from .migrafana.src.json_parser.parser import (
+from src.json_parser.parser import (
     JSONPathProcessor,
     JSONPathNormalizer,
     JSONPathResolver,
