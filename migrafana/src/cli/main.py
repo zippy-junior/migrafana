@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from api.datasource import GrafanaDataSourceManager
 from json_parser.parser import apply_patch
 from api.dashboard import GrafanaDashboardManager
-from api.models import GrafanaCreds
+from api.models import GrafanaConfig
 
 load_dotenv()
 
@@ -17,7 +17,7 @@ def get_credentials():
     env_user = os.getenv('GRAFANA_API_USER')
     env_pass = os.getenv('GRAFANA_API_PASS')
     if env_user and env_pass:
-        return GrafanaCreds(login=env_user, password=env_pass)
+        return GrafanaConfig(login=env_user, password=env_pass)
 
     raise click.BadParameter("No credentials found")
 
