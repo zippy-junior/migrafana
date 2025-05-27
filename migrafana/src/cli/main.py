@@ -1,12 +1,10 @@
 import json
-import os
 import click
 from dotenv import load_dotenv
 
 from core.api.datasource import GrafanaDataSourceManager
-from core.json_parser.parser import apply_patch
 from core.api.dashboard import GrafanaDashboardManager
-from core.api.models import GrafanaConfig
+from core.json_parser.parser import apply_patch
 from core.journaling import stdout_logger as c_logger
 from core.context import using_manager
 
@@ -61,14 +59,13 @@ def dashboard(manager, src, dest, patch, uuid):
                               '"value": "Updated" '
                               '}]')
 @click.option('--uuid', help='UUID of datasource to change')
-def datasource(src, dest, patch, uuid):
+@using_manager(GrafanaDataSourceManager)
+def datasource(manager, src, dest, patch, uuid):
     patch_obj = parse_patch(patch)
-    creds = get_credentials()
-    # Initialize grafana-client
-    dash_manager = GrafanaDataSourceManager(src, creds)
-    datasource_dict = dash_manager.get_datasource(uuid)
-    updated_dash_dict = apply_patch(datasource_dict, patch_obj)
-    dash_manager.update_datasource(uuid, updated_dash_dict)
+    datasource_dict = manager.get_datasource(uuid)
+    updated_datasource_dict = apply_patch(datasource_dict, patch_obj)
+    manager.update(uuid, updated_datasource_dict)
+    return
 
 
 @cli.command
@@ -77,6 +74,7 @@ def datasource(src, dest, patch, uuid):
 def ls_datasources(manager, src):
     datasources = manager.get_all()
     c_logger.info(datasources)
+    return
 
 
 def main():
