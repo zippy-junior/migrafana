@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional, Union
-from api.base import GrafanaBaseManager
+from core.api.base import GrafanaBaseManager
 
 
 class GrafanaDataSourceManager(GrafanaBaseManager):

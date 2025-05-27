@@ -12,9 +12,9 @@ class GrafanaConnectionError(Exception):
 
 
 class Creds(BaseModel):
-    login: str
-    password: str
-    token: str
+    login: Optional[str]
+    password: Optional[str]
+    token: Optional[str]
 
 
 class GrafanaConfig(BaseModel):
