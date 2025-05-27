@@ -6,23 +6,12 @@ from dotenv import load_dotenv
 from core.api.datasource import GrafanaDataSourceManager
 from core.json_parser.parser import apply_patch
 from core.api.dashboard import GrafanaDashboardManager
-from core.api.models import Creds, GrafanaConfig
+from core.api.models import GrafanaConfig
 from core.journaling import stdout_logger as c_logger
+from core.context import using_manager
 
 
 load_dotenv()
-
-
-def get_credentials() -> Creds:
-    """Try multiple secure sources"""
-
-    grafana_user = os.getenv('GRAFANA_USER')
-    grafana_pass = os.getenv('GRAFANA_PASS')
-    grafana_api_token = os.getenv('GRAFANA_API_TOKEN')
-    if grafana_user and grafana_pass:
-        return Creds(login=grafana_user, password=grafana_pass, token=grafana_api_token)
-
-    raise click.BadParameter("No credentials found")
 
 
 def parse_patch(patch):
@@ -50,15 +39,14 @@ def cli():
                               '"value": "Updated" '
                               '}]')
 @click.option('--uuid', help='UUID of dashboard to change')
-def dashboard(src, dest, patch, uuid):
+@using_manager(GrafanaDashboardManager)
+def dashboard(manager, src, dest, patch, uuid):
     patch_obj = parse_patch(patch)
-    creds = get_credentials()
     # Initialize grafana-client
-    dash_manager = GrafanaDashboardManager.from_config(conf=GrafanaConfig(creds=creds, url=src))
-    dash_dict = dash_manager.get_dashboard(uuid)
+    dash_dict = manager.get_by_uid(uuid)
     updated_dash_dict = apply_patch(dash_dict['dashboard'], patch_obj)
     dash_dict['dashboard'] = updated_dash_dict
-    dash_manager.update_dashboard(dash_dict)
+    manager.update(dash_dict)
     return
 
 
@@ -85,11 +73,9 @@ def datasource(src, dest, patch, uuid):
 
 @cli.command
 @click.option('--src', required=True, help='URL of source Grafana instance')
-def ls_datasources(src):
-    creds = get_credentials()
-    # Initialize grafana-client
-    dash_manager = GrafanaDataSourceManager.from_config(conf=GrafanaConfig(creds=creds, url=src))
-    datasources = dash_manager.list_datasources()
+@using_manager(GrafanaDataSourceManager)
+def ls_datasources(manager, src):
+    datasources = manager.get_all()
     c_logger.info(datasources)
 
 

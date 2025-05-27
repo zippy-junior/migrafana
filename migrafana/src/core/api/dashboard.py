@@ -1,36 +1,35 @@
-from typing import Dict, List
 from core.api.base import GrafanaBaseManager
 
 
 class GrafanaDashboardManager(GrafanaBaseManager):
     """Manager for Grafana dashboards using grafana-client"""
 
-    def get_dashboard(self, uid: str) -> dict:
+    def get_by_uid(self, uid: str) -> dict:
         """Get dashboard by UID"""
-        dashboard_json = self.connection.instance.dashboard.get_dashboard(uid)
+        dashboard_json = self.connection.instance.dashboard.get_by_uid(uid)
         return dashboard_json
 
-    def create_dashboard(self, dashboard: dict) -> Dict:
+    def create(self, instance: dict) -> dict:
         """Create a new dashboard"""
-        return self.connection.instance.dashboard.update_dashboard(
-            dashboard=dashboard
+        return self.connection.instance.dashboard.update(
+            dashboard=instance
         )
 
-    def update_dashboard(self, dashboard: dict) -> Dict:
+    def update(self, instance: dict) -> dict:
         """Update existing dashboard"""
-        return self.connection.instance.dashboard.update_dashboard(
-            dashboard=dashboard
+        return self.connection.instance.dashboard.update(
+            dashboard=instance
         )
 
-    def delete_dashboard(self, uid: str) -> Dict:
+    def delete(self, uid: str) -> dict:
         """Delete dashboard by UID"""
-        return self.connection.instance.dashboard.delete_dashboard(uid)
+        return self.connection.instance.dashboard.delete(uid)
 
-    def search_dashboards(self, query: str = "", tag: str = "") -> List[Dict]:
+    def search(self, query: str = "", tag: str = "") -> dict:
         """Search for dashboards"""
         params = {}
         if query:
             params['query'] = query
         if tag:
             params['tag'] = tag
-        return self.connection.instance.search.search_dashboards(params=params)
+        return self.connection.instance.search.search(params=params)

@@ -5,44 +5,37 @@ from core.api.base import GrafanaBaseManager
 class GrafanaDataSourceManager(GrafanaBaseManager):
     """Manager for Grafana data sources using grafana-client"""
 
-    def get_datasource(self, uid: str) -> Dict:
+    def get_by_uid(self, uid: str) -> dict:
         """Get data source by UID"""
         return self.connection.instance.datasource.get_datasource_by_uid(uid)
 
-    def get_datasource_by_id(self, id: int) -> Dict:
+    def get_by_id(self, id: int) -> dict:
         """Get data source by ID"""
         return self.connection.instance.datasource.get_datasource_by_id(id)
 
-    def get_datasource_by_name(self, name: str) -> Dict:
+    def get_by_name(self, name: str) -> dict:
         """Get data source by name"""
         return self.connection.instance.datasource.get_datasource_by_name(name)
 
-    def create_datasource(self, datasource_config: Dict) -> Dict:
+    def create(self, instance: dict) -> dict:
         """
         Create a new data source
-        Args:
-            datasource_config: Complete data source configuration including:
-                - name: (str) Data source name
-                - type: (str) Data source type (prometheus, graphite, etc.)
-                - access: (str) Proxy or Direct
-                - url: (str) Data source URL
-                - (plus type-specific settings)
         """
-        return self.connection.instance.datasource.create_datasource(datasource_config)
+        return self.connection.instance.datasource.create_datasource(instance)
 
-    def update_datasource(self, uid: str, datasource_config: Dict) -> Dict:
+    def update(self, uid: str, instance: dict) -> dict:
         """Update existing data source by UID"""
-        return self.connection.instance.datasource.update_datasource_by_uid(uid, datasource_config)
+        return self.connection.instance.datasource.update_datasource_by_uid(uid, instance)
 
-    def delete_datasource(self, uid: str) -> Dict:
+    def delete(self, uid: str) -> dict:
         """Delete data source by UID"""
         return self.connection.instance.datasource.delete_datasource_by_uid(uid)
 
-    def delete_datasource_by_name(self, name: str) -> Dict:
+    def delete_by_name(self, name: str) -> dict:
         """Delete data source by name"""
         return self.connection.instance.datasource.delete_datasource_by_name(name)
 
-    def list_datasources(self) -> List[Dict]:
+    def get_all(self) -> list[dict]:
         """List all data sources"""
         return self.connection.instance.datasource.list_datasources()
 
