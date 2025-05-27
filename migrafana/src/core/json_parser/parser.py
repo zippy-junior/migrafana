@@ -304,6 +304,8 @@ class JSONPathTraverser:
         current = data
         for comp in components[:-1]:
             if isinstance(current, dict):
+                if comp not in current:
+                    raise ValueError(f"Key not found: {comp}")
                 current = current[comp]
             elif isinstance(current, list):
                 current = current[int(comp)]
@@ -351,6 +353,8 @@ class JSONPathOperator:
         current = data
         for comp in components[:-1]:
             if isinstance(current, dict):
+                if comp not in current:
+                    raise ValueError(f"Key not found: {comp}")
                 current = current[comp]
             elif isinstance(current, list):
                 current = current[int(comp)]

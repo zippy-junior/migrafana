@@ -1,53 +1,35 @@
-from typing import Dict, List, Optional
-
-from core.api.base import GrafanaAPIClient
-from core.json_parser.parser import apply_patch
+from core.api.base import GrafanaBaseManager
 
 
-class GrafanaDashboardManager:
+class GrafanaDashboardManager(GrafanaBaseManager):
     """Manager for Grafana dashboards using grafana-client"""
 
-    def __init__(self, api_client: GrafanaAPIClient):
-        self.api = api_client
-
-    def get_dashboard(self, uid: str) -> dict:
+    def get_by_uid(self, uid: str) -> dict:
         """Get dashboard by UID"""
-        dashboard_json = self.api.client.dashboard.get_dashboard(uid)
+        dashboard_json = self.connection.instance.dashboard.get_by_uid(uid)
         return dashboard_json
 
-    def create_dashboard(self, dashboard: dict) -> Dict:
+    def create(self, instance: dict) -> dict:
         """Create a new dashboard"""
-        return self.api.client.dashboard.update_dashboard(
-            dashboard=dashboard
+        return self.connection.instance.dashboard.update(
+            dashboard=instance
         )
 
-    def update_dashboard(self, dashboard: dict) -> Dict:
+    def update(self, instance: dict) -> dict:
         """Update existing dashboard"""
-        return self.api.client.dashboard.update_dashboard(
-            dashboard=dashboard
+        return self.connection.instance.dashboard.update(
+            dashboard=instance
         )
 
-    def delete_dashboard(self, uid: str) -> Dict:
+    def delete(self, uid: str) -> dict:
         """Delete dashboard by UID"""
-        return self.api.client.dashboard.delete_dashboard(uid)
+        return self.connection.instance.dashboard.delete(uid)
 
-    def search_dashboards(self, query: str = "", tag: str = "") -> List[Dict]:
+    def search(self, query: str = "", tag: str = "") -> dict:
         """Search for dashboards"""
         params = {}
         if query:
             params['query'] = query
         if tag:
             params['tag'] = tag
-        return self.api.client.search.search_dashboards(params=params)
-
-    def transfer_datasource(
-        self,
-        uid: str,
-        patch_operations: list[dict],
-        target_service: Optional['GrafanaDashboardManager'] = None
-    ) -> Dict:
-        dashboard = self.get_dashboard(uid)
-        patched = apply_patch(dashboard['dashboard'], patch_operations)
-        dashboard['dashboard'] = patched
-        target = target_service if target_service else self
-        return target.update_dashboard(uid, dashboard)
+        return self.connection.instance.search.search(params=params)

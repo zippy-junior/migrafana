@@ -1,25 +1,15 @@
 import json
-import os
 import click
 from dotenv import load_dotenv
 
-from api.datasource import GrafanaDataSourceManager
-from json_parser.parser import apply_patch
-from api.dashboard import GrafanaDashboardManager
-from api.models import GrafanaCreds
+from core.api.datasource import GrafanaDataSourceManager
+from core.api.dashboard import GrafanaDashboardManager
+from core.json_parser.parser import apply_patch
+from core.journaling import stdout_logger as c_logger
+from core.context import using_manager
+
 
 load_dotenv()
-
-
-def get_credentials():
-    """Try multiple secure sources"""
-
-    env_user = os.getenv('GRAFANA_API_USER')
-    env_pass = os.getenv('GRAFANA_API_PASS')
-    if env_user and env_pass:
-        return GrafanaCreds(login=env_user, password=env_pass)
-
-    raise click.BadParameter("No credentials found")
 
 
 def parse_patch(patch):
@@ -47,15 +37,14 @@ def cli():
                               '"value": "Updated" '
                               '}]')
 @click.option('--uuid', help='UUID of dashboard to change')
-def dashboard(src, dest, patch, uuid):
+@using_manager(GrafanaDashboardManager)
+def dashboard(manager, src, dest, patch, uuid):
     patch_obj = parse_patch(patch)
-    creds = get_credentials()
     # Initialize grafana-client
-    dash_manager = GrafanaDashboardManager(src, creds)
-    dash_dict = dash_manager.get_dashboard(uuid)
+    dash_dict = manager.get_by_uid(uuid)
     updated_dash_dict = apply_patch(dash_dict['dashboard'], patch_obj)
     dash_dict['dashboard'] = updated_dash_dict
-    dash_manager.update_dashboard(dash_dict)
+    manager.update(dash_dict)
     return
 
 
@@ -70,24 +59,22 @@ def dashboard(src, dest, patch, uuid):
                               '"value": "Updated" '
                               '}]')
 @click.option('--uuid', help='UUID of datasource to change')
-def datasource(src, dest, patch, uuid):
+@using_manager(GrafanaDataSourceManager)
+def datasource(manager, src, dest, patch, uuid):
     patch_obj = parse_patch(patch)
-    creds = get_credentials()
-    # Initialize grafana-client
-    dash_manager = GrafanaDataSourceManager(src, creds)
-    datasource_dict = dash_manager.get_datasource(uuid)
-    updated_dash_dict = apply_patch(datasource_dict, patch_obj)
-    dash_manager.update_datasource(uuid, updated_dash_dict)
+    datasource_dict = manager.get_datasource(uuid)
+    updated_datasource_dict = apply_patch(datasource_dict, patch_obj)
+    manager.update(uuid, updated_datasource_dict)
+    return
 
 
 @cli.command
-@click.option('--src', help='URL of source Grafana instance')
-def get_datasources(src):
-    creds = get_credentials()
-    # Initialize grafana-client
-    dash_manager = GrafanaDataSourceManager(src, creds)
-    datasources = dash_manager.list_datasources()
-    print(datasources)
+@click.option('--src', required=True, help='URL of source Grafana instance')
+@using_manager(GrafanaDataSourceManager)
+def ls_datasources(manager, src):
+    datasources = manager.get_all()
+    c_logger.info(datasources)
+    return
 
 
 def main():
