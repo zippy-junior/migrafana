@@ -4,6 +4,7 @@ import os
 from core.api.base import GrafanaBaseManager
 from core.api.models import Creds, GrafanaConfig
 from core.journaling import internal_logger as i_logger
+from cli.commands.flag_ref import flags
 
 
 def get_credentials() -> Creds:
@@ -27,10 +28,9 @@ def using_manager(manager: GrafanaBaseManager):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             # Get src from kwargs (passed by Click)
-            src = kwargs.get('src', None)
-            if not src:
-                raise ValueError("Source URL (--src) must be provided")
-
+            if not flags.__getattribute__('src'):
+                raise KeyError("Flags don't have source attribute")
+            src = kwargs.get(flags.src.alias, None)
             creds = get_credentials()
             m = manager.from_config(conf=GrafanaConfig(creds=creds, url=src))
 

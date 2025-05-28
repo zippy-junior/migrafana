@@ -32,4 +32,9 @@ class GrafanaDashboardManager(GrafanaBaseManager):
             params['query'] = query
         if tag:
             params['tag'] = tag
-        return self.connection.instance.search.search(params=params)
+        params['type_'] = "dash-db"
+        return self.connection.instance.search.search_dashboards(**params)
+
+    def get_all(self) -> list[dict]:
+        """List all dashboards"""
+        return self.search()
