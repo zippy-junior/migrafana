@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 from typing import Self
 from grafana_client import GrafanaApi
 
-from core.api.models import (GrafanaConnection,
+from core.api.models import (GrafanaInstanceConfig,
                              GrafanaManagerConfig,
-                             GrafanaConnectionError)
+                             GrafanaConnectionError,
+                             GrafanaManagerConnections)
 from core.journaling import internal_logger as i_logger
 
 
@@ -38,28 +39,37 @@ class Manager(ABC):
 
 class GrafanaBaseManager():
 
-    def __init__(self, connection: GrafanaConnection):
-        self.connection = connection
+    def __init__(self, connections: GrafanaManagerConnections):
+        self.connections = connections
 
     @classmethod
     def from_config(cls, conf: GrafanaManagerConfig) -> Self:
-        connection: GrafanaConnection = cls.connect(conf)
-        if connection.error:
-            i_logger.error(connection.error)
-            raise GrafanaConnectionError(connection.error)
-        else:
-            return cls(connection)
+        master = None
+        slaves = []
+        for instance in conf.instances:
+            connection: GrafanaApi = cls.connect_to_instance(instance)
+            if instance.master:
+                master = connection
+            else:
+                slaves.append(connection)
+        connections = {
+            'master': master,
+            'slaves': slaves if len(slaves) > 0 else None
+        }
+        return cls(GrafanaManagerConnections(**connections))
 
-    def connect(conf: GrafanaManagerConfig):
-        grafana_inst = GrafanaApi.from_url(
-            url=conf.url,
-            credential=(conf.GrafanaCreds.login, conf.GrafanaCreds.password)
+    def connect_to_instance(inst_conf: GrafanaInstanceConfig) -> GrafanaApi:
+        instance = GrafanaApi.from_url(
+            url=inst_conf.url,
+            credential=inst_conf.credentials.token or (inst_conf.credentials.username,
+                                                       inst_conf.credentials.password)
         )
         try:
-            grafana_inst.connect()
-            return GrafanaConnection(instance=grafana_inst)
+            instance.connect()
+            return instance
         except Exception as e:
-            return GrafanaConnection(error=e)
+            i_logger.error(e)
+            raise GrafanaConnectionError(f"Can't connect to Grafana instance {inst_conf.url}: {e}")
 
     def get_by_uid(self, uid: str) -> dict:
         raise NotImplementedError()

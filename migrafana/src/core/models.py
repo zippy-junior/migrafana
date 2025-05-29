@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class NoGrafanaCredsError(BaseException):
+class NoGrafanaInstanceCredentialsError(BaseException):
     ...
 
 

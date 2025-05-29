@@ -1,9 +1,8 @@
 import click
 
-from cli.utils import apply_flag, parse_patch
+from cli.context import apply_flag, parse_patch, using_manager
 from cli.commands.flag_ref import flags
 from core.api.dashboard import GrafanaDashboardManager
-from core.context import using_manager
 from core.json_parser.parser import apply_patch
 from core.journaling import stdout_logger as c_logger
 
@@ -33,7 +32,7 @@ def export(manager, config, patch, uuid):
 @apply_flag(flags.url)
 @apply_flag(flags.config_path)
 @using_manager(GrafanaDashboardManager)
-def list_dashboards(config, url, config_path):
+def list_dashboards(manager, config, url, config_path):
     dashboards = manager.get_all()
-    # c_logger.info(dashboards)
+    c_logger.info(dashboards)
     return
