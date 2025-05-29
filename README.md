@@ -1,3 +1,10 @@
+[![Tests](https://github.com/panodata/grafana-client/workflows/Test/badge.svg)](https://github.com/panodata/grafana-client/actions?query=workflow%3ATest)
+[![Test coverage](https://img.shields.io/codecov/c/gh/panodata/grafana-client.svg?style=flat-square)](https://codecov.io/gh/panodata/grafana-client/)
+[![License](https://img.shields.io/github/license/panodata/grafana-client.svg?style=flat-square)](https://github.com/panodata/grafana-client/blob/main/LICENSE)
+
+[![Python versions](https://img.shields.io/pypi/pyversions/grafana-client.svg?style=flat-square)](https://pypi.org/project/grafana-client/)
+[![Grafana versions](https://img.shields.io/badge/Grafana-5.x%20--%2011.x-blue.svg?style=flat-square)](https://github.com/grafana/grafana)
+
 # Grafana Management Tool
 
 A powerful CLI tool for managing Grafana dashboards and datasources across instances with patch-based transformations.
