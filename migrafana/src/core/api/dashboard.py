@@ -6,14 +6,21 @@ class GrafanaDashboardManager(GrafanaBaseManager):
 
     def get_by_uid(self, uid: str) -> dict:
         """Get dashboard by UID"""
-        dashboard_json = self.connection.instance.dashboard.get_by_uid(uid)
+        dashboard_json = self.connections.master.dashboard.get_by_uid(uid)
         return dashboard_json
 
     def create(self, instance: dict) -> dict:
         """Create a new dashboard"""
-        return self.connection.instance.dashboard.update(
-            dashboard=instance
-        )
+        if not self.connections.slaves:
+            return self.connection.master.dashboard(
+                dashboard=instance
+            )
+        else:
+            for slave in self.connections.slaves:
+                slave.dashboard.update(
+                    dashboard=instance
+                )
+            return
 
     def update(self, instance: dict) -> dict:
         """Update existing dashboard"""
@@ -32,4 +39,9 @@ class GrafanaDashboardManager(GrafanaBaseManager):
             params['query'] = query
         if tag:
             params['tag'] = tag
-        return self.connection.instance.search.search(params=params)
+        params['type_'] = "dash-db"
+        return self.connections.master.search.search_dashboards(**params)
+
+    def get_all(self) -> list[dict]:
+        """List all dashboards"""
+        return self.search()

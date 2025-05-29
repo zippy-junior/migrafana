@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 from grafana_client import GrafanaApi
 
 
-class NoCredsError(Exception):
+class NoGrafanaInstanceCredentialsError(Exception):
     ...
 
 
@@ -11,19 +11,24 @@ class GrafanaConnectionError(Exception):
     ...
 
 
-class Creds(BaseModel):
-    login: Optional[str]
+class GrafanaInstanceCredentials(BaseModel):
+    username: Optional[str]
     password: Optional[str]
     token: Optional[str]
 
 
-class GrafanaConfig(BaseModel):
+class GrafanaInstanceConfig(BaseModel):
     url: str
-    creds: Creds
+    credentials: GrafanaInstanceCredentials
+    master: bool
 
 
-class GrafanaConnection(BaseModel):
+class GrafanaManagerConfig(BaseModel):
+    instances: list[GrafanaInstanceConfig]
+
+
+class GrafanaManagerConnections(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    instance: Optional[GrafanaApi] = None
-    error: Optional[Exception] = None
+    master: GrafanaApi
+    slaves: Optional[List[GrafanaApi]]

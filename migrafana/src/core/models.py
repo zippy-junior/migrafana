@@ -2,11 +2,11 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class NoCredsError(BaseException):
+class NoGrafanaInstanceCredentialsError(BaseException):
     ...
 
 
-class GrafanaConfig(BaseModel):
+class GrafanaManagerConfig(BaseModel):
     url: str
     username: Optional[str] = None
     password: Optional[str] = None
