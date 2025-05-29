@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 from grafana_client import GrafanaApi
 
 
-class NoCredsError(Exception):
+class NoGrafanaCredsError(Exception):
     ...
 
 
@@ -11,15 +11,20 @@ class GrafanaConnectionError(Exception):
     ...
 
 
-class Creds(BaseModel):
+class GrafanaCreds(BaseModel):
     login: Optional[str]
     password: Optional[str]
     token: Optional[str]
 
 
-class GrafanaConfig(BaseModel):
+class GrafanaInstanceConfig(BaseModel):
     url: str
-    creds: Creds
+    credentials: GrafanaCreds
+    master: bool
+
+
+class GrafanaManagerConfig(BaseModel):
+    instances: list[GrafanaInstanceConfig]
 
 
 class GrafanaConnection(BaseModel):

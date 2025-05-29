@@ -14,12 +14,11 @@ def datasource():
 
 
 @datasource.command
-@apply_flag(flags.src)
-@apply_flag(flags.dest)
+@apply_flag(flags.config)
 @apply_flag(flags.patch)
 @apply_flag(flags.uuid)
 @using_manager(GrafanaDataSourceManager)
-def export(manager, src, dest, patch, uuid):
+def export(manager, config, patch, uuid):
     patch_obj = parse_patch(patch)
     datasource_dict = manager.get_datasource(uuid)
     updated_datasource_dict = apply_patch(datasource_dict, patch_obj)
@@ -28,9 +27,9 @@ def export(manager, src, dest, patch, uuid):
 
 
 @datasource.command(name="list")
-@apply_flag(flags.src)
-@using_manager(GrafanaDataSourceManager)
-def list_datasources(manager, source):
-    datasources = manager.get_all()
-    c_logger.info(datasources)
+@apply_flag(flags.config)
+# @using_manager(GrafanaDataSourceManager)
+def list_datasources(config):
+    # datasources = manager.get_all()
+    c_logger.info(config)
     return

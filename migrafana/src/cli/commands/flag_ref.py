@@ -1,3 +1,4 @@
+from typing import Any, Optional
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
@@ -7,20 +8,29 @@ class Flag(BaseModel):
     alias: str
     type: type
     required: bool
+    default: Optional[Any] = None
     help: str
 
 
 class Flags(BaseSettings):
-    src: Flag = Flag(param_decls=['-s', '--source'],
-                     alias='source',
+    config: Flag = Flag(param_decls=['--conf'],
+                     alias='config',
                      type=str,
-                     required=True,
-                     help='URL of source Grafana instance')
-    dest: Flag = Flag(param_decls=['-d', '--destination'],
-                      alias='destination',
+                     required=False,
+                     help='Connection config. '
+                     'Accepts JSON string config: \'[{"url": "...", "master": "true"}, {"url": "..."}]\'')
+    config_path: Flag = Flag(param_decls=['--conf-path'],
+                      alias='config_path',
+                      required=False,
                       type=str,
-                      required=True,
-                      help='URL of destination Grafana instance')
+                      default=False,
+                      help='Path to config JSON file')
+    url: Flag = Flag(param_decls=['--url'],
+                      alias='url',
+                      required=False,
+                      type=str,
+                      default=False,
+                      help='Single grafana url')
     patch: Flag = Flag(param_decls=['-p', '--patch'],
                        alias='patch',
                        type=str,
