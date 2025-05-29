@@ -7,7 +7,6 @@ dependencies = [
     'charset-normalizer',
     'click',
     'dotenv',
-    'grafana-client',
     'h11',
     'idna',
     'jh2',
