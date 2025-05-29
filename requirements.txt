@@ -3,7 +3,6 @@ certifi==2025.1.31
 charset-normalizer==3.4.1
 click==8.1.0
 dotenv==0.9.9
-grafana-client==4.3.2
 h11==0.14.0
 idna==3.10
 jh2==5.0.8
