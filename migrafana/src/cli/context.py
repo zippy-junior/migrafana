@@ -18,13 +18,18 @@ def apply_flag(flag: Flag, **kwargs):
     def decorator(f):
         # Use the alias as the parameter name in the function
         # and the param_decls for the CLI options
+        overwrite_required = kwargs.get('required', None)
+        # Apply overwrites if specified
+        required = overwrite_required if overwrite_required is not None else flag.required
         return click.option(
+
             # Add alias to param_decls list so that we get known param name in cli function
             *[*flag.param_decls, flag.alias],
             cls=click.Option,
             type=flag.type,
-            required=flag.required,
+            required=required,
             help=flag.help,
+            is_flag=flag.is_flag
         )(f)
     return decorator
 
@@ -117,6 +122,9 @@ def using_patch():
         @wraps(fn)
         def wrapper(*args, **kwargs):
             raw_patch = kwargs.get(flags.patch.alias, None)
+            if not raw_patch:
+                fn(*args, **kwargs)
+                return
             is_path = Path(raw_patch).is_file()
             if is_path:
                 with open(f'{raw_patch}', 'r+') as patch_file:

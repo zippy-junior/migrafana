@@ -32,10 +32,19 @@ class GrafanaServerError(GrafanaException):
 
 class GrafanaClientError(GrafanaException):
     """
-    Invalid input (4xx errors)
+    Invalid input (4xx errors except 404)
     """
 
     pass
+
+
+class GrafanaNotFoundError(GrafanaClientError):
+    """
+    Not found (404 error)
+    """
+
+    def __init__(self, response):
+        super(GrafanaNotFoundError, self).__init__(404, response, f"Bad Input: `{response}`")
 
 
 class GrafanaBadInputError(GrafanaClientError):
@@ -115,7 +124,9 @@ class GrafanaClient:
 
         self.url = construct_api_url()
 
-        from grafana_client import __appname__, __version__
+        import sys
+        sys.path.append("..")
+        from migrafana.src import __appname__, __version__
 
         self.user_agent = user_agent or f"{__appname__}/{__version__}"
 
@@ -166,6 +177,8 @@ class GrafanaClient:
                 raise GrafanaBadInputError(response)
             elif r.status_code == 401:
                 raise GrafanaUnauthorizedError(response)
+            elif r.status_code == 404:
+                return None
             elif 400 <= r.status_code < 500:
                 raise GrafanaClientError(
                     r.status_code,

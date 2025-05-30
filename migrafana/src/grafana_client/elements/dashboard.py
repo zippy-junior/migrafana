@@ -1,3 +1,4 @@
+import uuid
 import warnings
 
 from verlib2 import Version
@@ -33,12 +34,29 @@ class Dashboard(Base):
         get_dashboard_path = "/dashboards/db/%s" % dashboard_name
         return self.client.GET(get_dashboard_path)
 
-    def create_dashboard(self, dashboard):
+    def create_dashboard(self, dashboard: dict):
+        dashboard['dashboard']['uid'] = None
         dashboard['dashboard']['id'] = None
-        dashboard['overwrite'] = True
+        dashboard['dashboard']['version'] = 0
+        dashboard['overwrite'] = False
 
-        create_dashboard_path = "/api/dashboards/db"
+        for attribute in ["folderId", "folderUid"]:
+            if attribute not in dashboard:
+                if "meta" in dashboard and attribute in dashboard["meta"]:
+                    dashboard = dashboard.copy()
+                    dashboard[attribute] = dashboard["meta"][attribute]
+
+        dashboard.pop('meta')
+
+        create_dashboard_path = "/dashboards/db"
         self.client.POST(create_dashboard_path, json=dashboard)
+
+    def get_dashboard_version(self, uid: str) -> int:
+        dashboard = self.get_dashboard(uid)
+        if dashboard:
+            version = dashboard['dashboard']['version']
+            return version
+        return None
 
     def update_dashboard(self, dashboard):
         """
@@ -49,6 +67,9 @@ class Dashboard(Base):
 
         # When `folderId` or `folderUid` are not available within the dashboard payload,
         # populate them from the nested `meta` object, when given.
+        cur_version = self.get_dashboard_version(dashboard['dashboard']['uid'])
+        dashboard['dashboard']['version'] = cur_version
+        print(cur_version, "dfkvdkjfn")
         for attribute in ["folderId", "folderUid"]:
             if attribute not in dashboard:
                 if "meta" in dashboard and attribute in dashboard["meta"]:

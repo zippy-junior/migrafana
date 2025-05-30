@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Self
-from grafana_client import GrafanaApi
+from grafana_client.api import GrafanaApi
 
 from core.api.models import (GrafanaInstanceConfig,
                              GrafanaManagerConfig,
