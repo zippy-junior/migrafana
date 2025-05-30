@@ -2,6 +2,8 @@ from typing import Dict, List, Union, Any, Tuple
 from copy import deepcopy
 import re
 
+from core.models import Patch
+
 
 class JSONPathProcessor:
     """Main class for processing JSON paths with selector support"""
@@ -9,17 +11,17 @@ class JSONPathProcessor:
     @staticmethod
     def apply_patch(
         data: Union[Dict, List],
-        patch: List[Dict]
+        patch: Patch
     ) -> Union[Dict, List]:
         """
         Applies RFC 6902 JSON Patch operations with selector support
         """
         result = deepcopy(data)
 
-        for operation in patch:
-            op = operation['op']
-            path = operation['path']
-            value = operation.get('value')
+        for operation in patch.root:
+            op = operation.op
+            path = operation.path
+            value = operation.value
 
             try:
                 normalized_path = JSONPathNormalizer.normalize(path)
@@ -423,7 +425,7 @@ class JSONPathOperator:
 # Public API
 def apply_patch(
     data: Union[Dict, List],
-    patch: List[Dict]
+    patch: Patch
 ) -> Union[Dict, List]:
     """Public interface for applying JSON patches"""
     return JSONPathProcessor.apply_patch(data, patch)

@@ -25,7 +25,11 @@ class Manager(ABC):
         ...
 
     @abstractmethod
-    def update(self, instance: dict) -> dict:
+    def update_master(self, instance: dict) -> dict:
+        ...
+
+    @abstractmethod
+    def update_slaves(self, instance: dict) -> dict:
         ...
 
     @abstractmethod
@@ -74,10 +78,13 @@ class GrafanaBaseManager():
     def get_by_uid(self, uid: str) -> dict:
         raise NotImplementedError()
 
-    def create(self, instance: dict) -> dict:
+    def create(self, data: dict) -> dict:
         raise NotImplementedError()
 
-    def update(self, instance: dict) -> dict:
+    def update_master(self, data: dict) -> dict:
+        raise NotImplementedError()
+
+    def update_slaves(self, data: dict) -> dict:
         raise NotImplementedError()
 
     def delete(self, uid: str) -> dict:

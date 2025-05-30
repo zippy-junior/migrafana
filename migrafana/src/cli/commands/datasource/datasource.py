@@ -1,7 +1,7 @@
 import click
 from core.api.datasource import GrafanaDataSourceManager
 from core.json_parser.parser import apply_patch
-from cli.commands.flag_ref import flags
+from cli.flag_ref import flags
 from cli.context import apply_flag, using_manager
 from core.journaling import stdout_logger as c_logger
 
@@ -14,13 +14,12 @@ def datasource():
 @datasource.command
 @apply_flag(flags.config)
 @apply_flag(flags.patch)
-@apply_flag(flags.uuid)
+@apply_flag(flags.uid)
 @using_manager(GrafanaDataSourceManager)
-def export(manager, config, patch, uuid):
-    # patch_obj = parse_patch(patch)
-    datasource_dict = manager.get_datasource(uuid)
-    updated_datasource_dict = apply_patch(datasource_dict, patch_obj)
-    manager.update(uuid, updated_datasource_dict)
+def export(manager, uid, patch, **kwargs):
+    datasource_dict = manager.get_datasource(uid)
+    updated_datasource_dict = apply_patch(datasource_dict, patch)
+    manager.update(uid, updated_datasource_dict)
     return
 
 

@@ -1,18 +1,12 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from typing import Literal, Optional
+from pydantic import BaseModel, RootModel
 
 
-class NoGrafanaInstanceCredentialsError(BaseException):
-    ...
-
-
-class GrafanaManagerConfig(BaseModel):
-    url: str
-    username: Optional[str] = None
-    password: Optional[str] = None
-    api_key: Optional[str] = None
-
-
-class PatchConfig(BaseModel):
+class PatchOp(BaseModel):
     path: str
-    operations: list[dict] = Field(default_factory=list)
+    op: Literal['test', 'add', 'remove', 'replace']
+    value: Optional[int | bool | str | dict | list | tuple] = None
+
+
+class Patch(RootModel):
+    root: list[PatchOp]
