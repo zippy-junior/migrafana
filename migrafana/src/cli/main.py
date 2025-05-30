@@ -2,8 +2,8 @@ import click
 from dotenv import load_dotenv
 from importlib.metadata import version
 
-from cli.commands.dashboard.dashboard import dashboard
-from cli.commands.datasource.datasource import datasource
+from cli.commands.dashboard import dashboard
+from cli.commands.datasource import datasource
 
 
 load_dotenv()

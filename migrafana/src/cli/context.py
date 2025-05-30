@@ -1,17 +1,16 @@
-import json
 import os
 from pathlib import Path
 from typing import Optional
 import click
 from dotenv import load_dotenv
 from pydantic import ValidationError
-from cli.commands.flag_ref import Flag
+from cli.flag_ref import Flag, flags
 from functools import wraps
 from urllib.parse import parse_qs, urlparse
 
 from core.api.base import GrafanaBaseManager
 from core.api.models import GrafanaInstanceConfig, GrafanaInstanceCredentials, GrafanaManagerConfig
-from cli.commands.flag_ref import flags
+from core.models import Patch
 
 
 def apply_flag(flag: Flag, **kwargs):
@@ -19,13 +18,18 @@ def apply_flag(flag: Flag, **kwargs):
     def decorator(f):
         # Use the alias as the parameter name in the function
         # and the param_decls for the CLI options
+        overwrite_required = kwargs.get('required', None)
+        # Apply overwrites if specified
+        required = overwrite_required if overwrite_required is not None else flag.required
         return click.option(
+
             # Add alias to param_decls list so that we get known param name in cli function
             *[*flag.param_decls, flag.alias],
             cls=click.Option,
             type=flag.type,
-            required=flag.required,
+            required=required,
             help=flag.help,
+            is_flag=flag.is_flag
         )(f)
     return decorator
 
@@ -113,10 +117,25 @@ def using_manager(manager: GrafanaBaseManager):
     return decorator
 
 
-def parse_patch(patch_path):
-    try:
-        with open(f'{patch_path}', 'r+') as patch_file:
-            patch = patch_file.read()
-            return json.loads(patch)
-    except Exception:
-        return
+def using_patch():
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            raw_patch = kwargs.get(flags.patch.alias, None)
+            if not raw_patch:
+                fn(*args, **kwargs)
+                return
+            is_path = Path(raw_patch).is_file()
+            if is_path:
+                with open(f'{raw_patch}', 'r+') as patch_file:
+                    raw_patch = patch_file.read()
+            try:
+                parsed_patch = Patch.model_validate_json(raw_patch)
+            except ValidationError as e:
+                raise click.BadParameter(f"""Patch not valid. {e.errors(include_url=False,
+                                                                        include_input=False,
+                                                                        include_context=False)}""")
+            kwargs[flags.patch.alias] = parsed_patch
+            fn(*args, **kwargs)
+        return wrapper
+    return decorator

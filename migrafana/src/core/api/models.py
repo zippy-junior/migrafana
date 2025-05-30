@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
-from grafana_client import GrafanaApi
+from grafana_client.api import GrafanaApi
 
 
 class NoGrafanaInstanceCredentialsError(Exception):
